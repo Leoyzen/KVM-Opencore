@@ -10,21 +10,32 @@
   <memoryBacking>
     <nosharepages/>
   </memoryBacking>
-  <vcpu placement='static'>8</vcpu>
+  <!-- If you wanna passthrough all 8-cores, change current='6' to current='8' -->
+  <vcpu placement='static' current='6'>8</vcpu>
   <iothreads>1</iothreads>
+  <vcpus>
+    <vcpu id='0' enabled='yes' hotpluggable='no' order='1'/>
+    <vcpu id='1' enabled='yes' hotpluggable='yes' order='2'/>
+    <vcpu id='2' enabled='yes' hotpluggable='yes' order='3'/>
+    <vcpu id='3' enabled='yes' hotpluggable='yes' order='4'/>
+    <vcpu id='4' enabled='yes' hotpluggable='yes' order='5'/>
+    <vcpu id='5' enabled='yes' hotpluggable='yes' order='5'/>
+    <!-- If you wanna passthrough all 8-cores, enable 6/7 two vcpus -->
+    <vcpu id='6' enabled='no' hotpluggable='yes' order='6'/>
+    <vcpu id='7' enabled='no' hotpluggable='yes' order='7'/>
+  </vcpus>
   <cputune>
-    <vcpupin vcpu='0' cpuset='4'/>
-    <vcpupin vcpu='1' cpuset='12'/>
-    <vcpupin vcpu='2' cpuset='5'/>
-    <vcpupin vcpu='3' cpuset='13'/>
-    <vcpupin vcpu='4' cpuset='6'/>
-    <vcpupin vcpu='5' cpuset='14'/>
-    <vcpupin vcpu='6' cpuset='7'/>
-    <vcpupin vcpu='7' cpuset='15'/>
-    <iothreadpin iothread='1' cpuset='0,8'/>
+    <vcpupin vcpu='0' cpuset='0'/>
+    <vcpupin vcpu='1' cpuset='6'/>
+    <vcpupin vcpu='2' cpuset='1'/>
+    <vcpupin vcpu='3' cpuset='7'/>
+    <vcpupin vcpu='4' cpuset='2'/>
+    <vcpupin vcpu='5' cpuset='8'/>
+    <iothreadpin iothread='1' cpuset='3,9'/>
   </cputune>
   <os>
     <type arch='x86_64' machine='pc-q35-4.2'>hvm</type>
+    <!-- We don't need patched OVMF anymore when using latest Opencore, stock one is okay -->
     <loader readonly='yes' type='pflash'>/usr/share/qemu/ovmf-x64/OVMF_CODE-pure-efi.fd</loader>
     <nvram>/etc/libvirt/qemu/nvram/4450a55c-1669-da0e-d0bd-3ab45fef0398_VARS-pure-efi.fd</nvram>
     <boot dev='hd'/>
@@ -33,7 +44,10 @@
     <acpi/>
     <apic/>
   </features>
-  <cpu mode='host-passthrough' check='none'/>
+  <cpu mode='host-passthrough' check='none'>
+    <!-- If you wanna passthrough all 8-cores, change cores to 4 -->
+    <topology sockets='1' cores='3' threads='2'/>
+  </cpu>
   <clock offset='utc'>
     <timer name='rtc' tickpolicy='catchup'/>
     <timer name='pit' tickpolicy='delay'/>
@@ -115,6 +129,7 @@
       <master startport='4'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x07' function='0x2'/>
     </controller>
+    <!-- Make sure you put your nic in bus 0x0 and slot 0x0y(y is numeric), this will make nic built-in and apple-store work-->
     <interface type='bridge'>
       <mac address='52:54:00:3e:21:a2'/>
       <source bridge='br0.100'/>
@@ -133,9 +148,24 @@
       <target type='virtio' name='org.qemu.guest_agent.0'/>
       <address type='virtio-serial' controller='0' bus='0' port='1'/>
     </channel>
-    <input type='mouse' bus='ps2'/>
-    <input type='keyboard' bus='ps2'/>
-    <hostdev mode='subsystem' type='pci' managed='yes'>
+    <input type='tablet' bus='usb'>
+      <alias name='input0'/>
+      <address type='usb' bus='0' port='1'/>
+    </input>
+    <!-- Mouse sets to usb will make unexpected behaviors when using VNC, so we use ps2 here.-->
+    <input type='mouse' bus='ps2'>
+      <alias name='input1'/>
+    </input>
+    <!-- This is required to make Keyboard work during installation when using VNC -->
+    <input type='keyboard' bus='usb'>
+      <alias name='input2'/>
+      <address type='usb' bus='0' port='3'/>
+    </input>
+    <input type='keyboard' bus='ps2'>
+      <alias name='input3'/>
+    </input>
+    <!-- If you wanna passthrough GPU, make sure the gfx and audio are in the same bus (like 0x01) but different function (0x00 and 0x01)-->
+    <!-- <hostdev mode='subsystem' type='pci' managed='yes'>
       <driver name='vfio'/>
       <source>
         <address domain='0x0000' bus='0x2d' slot='0x00' function='0x0'/>
@@ -149,13 +179,23 @@
         <address domain='0x0000' bus='0x2d' slot='0x00' function='0x1'/>
       </source>
       <address type='pci' domain='0x0000' bus='0x01' slot='0x00' function='0x1'/>
-    </hostdev>
+    </hostdev> -->
+    <!-- If you wanna passthrough onboard audio(like 30:00.4), make sure you put it in bus 0x00 and slot 0x0y(y is numeric), otherwise AppleALC won't recognized it -->
+    <!-- <hostdev mode='subsystem' type='pci' managed='yes'>
+      <driver name='vfio'/>
+      <source>
+        <address domain='0x0000' bus='0x30' slot='0x00' function='0x4'/>
+      </source>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x08' function='0x0'/>
+    </hostdev> -->
     <memballoon model='none'/>
   </devices>
   <qemu:commandline>
-    <qemu:arg value='-device'/>
-    <qemu:arg value='isa-applesmc,osk=ourhardworkbythesewordsguardedpleasedontsteal(c)AppleComputerInc'/>
     <qemu:arg value='-cpu'/>
     <qemu:arg value='Penryn,vendor=GenuineIntel,+hypervisor,+invtsc,kvm=on,+fma,+avx,+avx2,+aes,+ssse3,+sse4_2,+popcnt,+sse4a,+bmi1,+bmi2'/>
+    <!-- If you wanna use cpu host-passthrough mode, uncomments below-->
+    <!-- <qemu:arg value='host,vendor=GenuineIntel,+hypervisor,+invtsc,kvm=on,+fma,+avx,+avx2,+aes,+ssse3,+sse4_2,+popcnt,+sse4a,+bmi1,+bmi2'/> -->
+    <!-- If you wanna use cpu emulating mode like Skylake-Server, uncomments below-->
+    <!-- <qemu:arg value='Skylake-Server,vendor=GenuineIntel,+hypervisor,+invtsc,kvm=on,+fma,+avx,+avx2,+aes,+ssse3,+sse4_2,+popcnt,+sse4a,+bmi1,+bmi2'/> -->
   </qemu:commandline>
 </domain>
