@@ -19,10 +19,10 @@
     <vcpu id='2' enabled='yes' hotpluggable='yes' order='3'/>
     <vcpu id='3' enabled='yes' hotpluggable='yes' order='4'/>
     <vcpu id='4' enabled='yes' hotpluggable='yes' order='5'/>
-    <vcpu id='5' enabled='yes' hotpluggable='yes' order='5'/>
+    <vcpu id='5' enabled='yes' hotpluggable='yes' order='6'/>
     <!-- If you wanna passthrough all 8-cores, enable 6/7 two vcpus -->
-    <vcpu id='6' enabled='no' hotpluggable='yes' order='6'/>
-    <vcpu id='7' enabled='no' hotpluggable='yes' order='7'/>
+    <vcpu id='6' enabled='no' hotpluggable='yes' order='7'/>
+    <vcpu id='7' enabled='no' hotpluggable='yes' order='8'/>
   </vcpus>
   <cputune>
     <vcpupin vcpu='0' cpuset='0'/>
