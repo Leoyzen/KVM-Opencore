@@ -15,9 +15,8 @@ We propose best practice for KVM users.
 * SMBIOS: iMacPro1,1
 * NIC: vmxnet3/e1000-82545em/passthrough
 * CPU:
-    * Penryn: works, using patches to enable leaf7 support for better performance
-    * Intel Host-Passthrough: works, but with patches and remove topology line
-    * AMD Host-PassThrough: works, but with AMD-Vanilla patches
+    * Intel Host-Passthrough: works
+    * AMD Host-PassThrough: works
 * GPU Passthrough: works
     * HDMI/DP Audio: works
     * Metal Support: works
@@ -45,31 +44,14 @@ Comparing with normal hackintosh setup, we have only limited choices here(becaus
 
 ## CPU
 ### Models Selection
-You have three options to choose: Penryn, Passthrough, Emulating Model.
-
-#### Penryn
-Penryn is the safest choice in Hackintosh VM, it is classic, similar with virtualized enviroment, and Apple wrote native code to support it.
-But we should do something to make it work more than that:
-
-1. You should passthrough some important cpuid features which don't included in Penryn Model, such as:
-   * invtsc: latest MacOS won't boot without it
-   * AVX: latest MacOS won't boot without it
-   * FMA: metal support needs this
-   * AVX2
-   * BMI1
-   * BMI2
-   * kvm=on: QEMU use it to expose Hypervisor leaf node, which MacOS use it to determine the invtsc frequency from hypervisor node.
-   * ~~vmware-cpu-freq=on~~: no more need, QEMU enabled it by default.
-2. Add patch(from AMD-Vanilla) to support leaf7 cpuid features support
-   * otherwise Apple won't use some important feature like AVX
-   * can be check with `sysctl -a|grep machdep.cpu.leaf7_features` to see whether AVX/AVX2 is included.
+You have two options to choose: Passthrough, Emulating Model.
 
 #### Passthrough
 #### Intel
 If you are using most recent generation Intel CPU(newer than Penryn), then you can just passthrough your cpu type with `mode='host-passthrough'`.
 
 ##### AMD
-You can passthrough amd process too, but with [AMD-Vanilla patches](https://github.com/AMD-OSX/AMD_Vanilla) like bare metal hackintosh.
+You can passthrough amd processer also, but OpenCore will emulate a Xeon processor.
 
 ### Other Notes about CPU
 #### Irregular Topology
@@ -141,7 +123,7 @@ __You have to make sure you put the gfx and graphic audio in the same bus but di
 If you did it right, then there is no much differeces between VM and normal setup procedure, just adding Lilu/WEG/AppleALC then the Metal/H264/H265 HW/HDMI Audio will work well in most case.
 
 ## USB
-We use EHC/UHC from qemu now(XHCI(nec/qemu) can't be recognized by MacOS now).
+XHCI(nec/qemu) can be used by MacOS, but you it is limited to 7 emulated USB ports.
 USB port mapping(EHC) and USB Power injection(with fake EC ioreg) are already included in config.plist.
 
 # Known Problems/Help
