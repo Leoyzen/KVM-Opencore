@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>BuildMachineOSBuild</key>
-	<string>18A391011</string>
+	<string>20A241123</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleGetInfoString</key>
-	<string>111.1.18, Copyright 2008-2016 Apple Inc. All rights reserved.</string>
+	<string>113, Copyright 2008-2019 Apple Inc. All rights reserved.</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.apple.driver.AGPMInjector</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -17,11 +17,11 @@
 	<key>CFBundlePackageType</key>
 	<string>KEXT</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.7.3-AGPMInjector</string>
+	<string>3.2.6</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>111.1.18</string>
+	<string>127</string>
 	<key>IOKitPersonalities</key>
 	<dict>
 		<key>AGPM</key>
@@ -36,16 +36,16 @@
 			<string>IOPlatformPluginDevice</string>
 			<key>Machines</key>
 			<dict>
-				<key>iMacPro1,1</key>
+				<key>MacPro7,1</key>
 				<dict>
-					<key>GFX0</key>
+					<key>Vendor1002Device73bf</key>
 					<dict>
 						<key>AGDCEnabled</key>
 						<integer>1</integer>
 						<key>Heuristic</key>
 						<dict>
 							<key>ID</key>
-							<integer>4</integer>
+							<integer>-1</integer>
 						</dict>
 						<key>control-id</key>
 						<integer>17</integer>
@@ -59,7 +59,7 @@
 		</dict>
 	</dict>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2008-2016 Apple Inc. All rights reserved.</string>
+	<string>Copyright © 2008-2019 Apple Inc. All rights reserved.</string>
 	<key>OSBundleRequired</key>
 	<string>Safe Boot</string>
 </dict>

@@ -34,6 +34,8 @@
     <iothreadpin iothread='1' cpuset='3,9'/>
   </cputune>
   <os>
+    <!-- If you want to use latest Q35 machine type, uncomment the next line and comment out the line 39 -->
+    <!-- <type arch='x86_64' machine='pc-q35-6.1'>hvm</type> -->
     <type arch='x86_64' machine='pc-q35-4.2'>hvm</type>
     <!-- We don't need patched OVMF anymore when using latest Opencore, stock one is okay -->
     <loader readonly='yes' type='pflash'>/usr/share/qemu/ovmf-x64/OVMF_CODE-pure-efi.fd</loader>
@@ -48,10 +50,11 @@
     <!-- If you wanna passthrough all 8-cores, change cores to 4 -->
     <topology sockets='1' cores='3' threads='2'/>
   </cpu>
-  <clock offset='utc'>
+  <clock offset='localtime'>
     <timer name='rtc' tickpolicy='catchup'/>
     <timer name='pit' tickpolicy='delay'/>
     <timer name='hpet' present='no'/>
+    <timer name='tsc' present='yes' mode='native'/>
   </clock>
   <on_poweroff>destroy</on_poweroff>
   <on_reboot>restart</on_reboot>
@@ -191,10 +194,16 @@
     <memballoon model='none'/>
   </devices>
   <qemu:commandline>
+    <!-- If you wanna use the latest Q35 machine type, uncomments below-->
+    <!-- <qemu:arg value='-global'/> -->
+    <!-- <qemu:arg value='ICH9-LPC.acpi-pci-hotplug-with-bridge-support=off'/> -->
+    <!-- If you wanna use macOS without having to add VirtualSMC.kext for injection, uncomments below-->
+    <!-- <qemu:arg value='-device'/> -->
+    <!-- <qemu:arg value='isa-applesmc,osk=ourhardworkbythesewordsguardedpleasedontsteal(c)AppleComputerInc'/> -->
     <qemu:arg value='-cpu'/>
     <qemu:arg value='Penryn,vendor=GenuineIntel,+hypervisor,+invtsc,kvm=on,+fma,+avx,+avx2,+aes,+ssse3,+sse4_2,+popcnt,+sse4a,+bmi1,+bmi2'/>
     <!-- If you wanna use cpu host-passthrough mode, uncomments below-->
-    <!-- <qemu:arg value='host,vendor=GenuineIntel,+hypervisor,+invtsc,kvm=on,+fma,+avx,+avx2,+aes,+ssse3,+sse4_2,+popcnt,+sse4a,+bmi1,+bmi2'/> -->
+    <!-- <qemu:arg value='host,vendor=GenuineIntel'/> -->
     <!-- If you wanna use cpu emulating mode like Skylake-Server, uncomments below-->
     <!-- <qemu:arg value='Skylake-Server,vendor=GenuineIntel,+hypervisor,+invtsc,kvm=on,+fma,+avx,+avx2,+aes,+ssse3,+sse4_2,+popcnt,+sse4a,+bmi1,+bmi2'/> -->
   </qemu:commandline>
